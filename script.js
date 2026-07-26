@@ -324,6 +324,7 @@
         perk.apply(state);
         upgradeOverlay.classList.add('hidden');
         paused = false;
+        if(isTouchDevice()) setTimeout(focusMobileInput, 50);
       };
       perkOptions.appendChild(card);
     });
@@ -347,6 +348,7 @@
     document.getElementById('final-acc').textContent = acc + '%';
     document.getElementById('final-missed').textContent = wordsMissed;
     gameoverOverlay.classList.remove('hidden');
+    mobileInput.blur();
   }
 
   function startGame(){
@@ -359,27 +361,30 @@
     startTime = Date.now();
     spawnEnemy();
     requestAnimationFrame(gameLoop);
+    if(isTouchDevice()) setTimeout(focusMobileInput, 50);
   }
 
-  window.addEventListener('keydown', (e)=>{
-    if(!running || paused) return;
-    if(e.key === 'Backspace'){
-      state.buffer = state.buffer.slice(0,-1);
-      refreshBuffer();
-      enemies.forEach(en=>{
-        if(state.buffer.length && en.word.startsWith(state.buffer)){
-          en.label.parentElement.classList.add('target');
-          renderWord(en.label, en.word, state.buffer);
-        } else {
-          en.label.parentElement.classList.remove('target');
-          renderWord(en.label, en.word, '');
-        }
-      });
-      e.preventDefault();
-      return;
-    }
-    if(!/^[a-zA-Z]$/.test(e.key)) return;
-    const candidate = state.buffer + e.key.toLowerCase();
+  function isTouchDevice(){
+    return ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+  }
+
+  function handleBackspace(){
+    state.buffer = state.buffer.slice(0,-1);
+    refreshBuffer();
+    enemies.forEach(en=>{
+      if(state.buffer.length && en.word.startsWith(state.buffer)){
+        en.label.parentElement.classList.add('target');
+        renderWord(en.label, en.word, state.buffer);
+      } else {
+        en.label.parentElement.classList.remove('target');
+        renderWord(en.label, en.word, '');
+      }
+    });
+  }
+
+  function handleLetter(ch){
+    if(!/^[a-zA-Z]$/.test(ch)) return;
+    const candidate = state.buffer + ch.toLowerCase();
     const matchIdx = enemies.findIndex(en => en.word.startsWith(candidate));
     if(matchIdx >= 0){
       state.buffer = candidate;
@@ -416,7 +421,63 @@
       setTimeout(()=>bufferEl.style.transform='', 60);
     }
     updateHud();
+  }
+
+  window.addEventListener('keydown', (e)=>{
+    if(!running || paused) return;
+    // Skip physical keydown chars if focus is in the mobile input;
+    // the 'input' event handler below deals with those instead.
+    if(document.activeElement === mobileInput) return;
+    if(e.key === 'Backspace'){
+      handleBackspace();
+      e.preventDefault();
+      return;
+    }
+    if(!/^[a-zA-Z]$/.test(e.key)) return;
+    handleLetter(e.key);
   });
+
+  // ===== Mobile on-screen keyboard support =====
+  const mobileInput = document.getElementById('mobile-input');
+  const stageEl = document.getElementById('stage');
+  let mobileInputValue = '';
+
+  function focusMobileInput(){
+    if(!running || paused) return;
+    mobileInputValue = '';
+    mobileInput.value = '';
+    mobileInput.focus({ preventScroll: true });
+  }
+
+  mobileInput.addEventListener('input', ()=>{
+    if(!running || paused) return;
+    const val = mobileInput.value;
+    if(val.length > mobileInputValue.length){
+      const added = val.slice(mobileInputValue.length);
+      for(const ch of added){ handleLetter(ch); }
+    } else if(val.length < mobileInputValue.length){
+      const removed = mobileInputValue.length - val.length;
+      for(let i=0;i<removed;i++){ handleBackspace(); }
+    }
+    mobileInputValue = val;
+    // Keep the hidden field short so it never visibly grows.
+    if(mobileInput.value.length > 20){
+      mobileInput.value = '';
+      mobileInputValue = '';
+    }
+  });
+
+  mobileInput.addEventListener('keydown', (e)=>{
+    if(e.key === 'Backspace' && mobileInput.value.length === 0){
+      handleBackspace();
+      e.preventDefault();
+    }
+  });
+
+  // Tapping anywhere on the stage while playing brings the keyboard back up.
+  stageEl.addEventListener('touchstart', ()=>{
+    if(running && !paused) focusMobileInput();
+  }, { passive:true });
 
   function refreshBuffer(){
     bufferEl.innerHTML = state.buffer.length ? `<span class="txt">${state.buffer}</span>` : '&nbsp;';
@@ -426,14 +487,25 @@
     if(!running) return;
     paused = !paused;
     pauseBtn.textContent = paused ? 'Resume' : 'Pause';
+    if(paused){
+      mobileInput.blur();
+    } else if(isTouchDevice()){
+      setTimeout(focusMobileInput, 50);
+    }
   });
 
   document.getElementById('start-btn').addEventListener('click', startGame);
   document.getElementById('restart-btn').addEventListener('click', ()=>{
     startOverlay.classList.remove('hidden');
     gameoverOverlay.classList.add('hidden');
+    mobileInput.blur();
     reset();
   });
+
+  const hintEl = document.getElementById('hint');
+  if(isTouchDevice() && hintEl){
+    hintEl.textContent = 'Tap the arena, then type on your keyboard to strike. One wrong letter and that word is gone.';
+  }
 
   reset();
 })();
