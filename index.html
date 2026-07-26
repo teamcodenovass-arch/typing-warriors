@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ink Duelist — A Typing Battle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Yuji+Mai&family=Shippori+Mincho:wght@500;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="stage" id="stage">
+
+  <div class="titlebar">
+    <h1>墨 Ink Duelist</h1>
+    <div class="stamp">刀</div>
+  </div>
+
+  <div class="hud">
+    <div>Time <b class="time-left" id="hud-time">1:00</b></div>
+    <div>Wave <b id="hud-wave">1</b></div>
+    <div>Score <b id="hud-score">0</b></div>
+    <div>Combo <b id="hud-combo">0</b></div>
+    <div>WPM <b id="hud-wpm">0</b></div>
+    <div>Accuracy <b id="hud-acc">100%</b></div>
+    <div class="hp-wrap">HP
+      <div class="hp-track"><div class="hp-fill" id="hp-fill" style="width:100%"></div></div>
+    </div>
+  </div>
+
+  <div class="arena" id="arena">
+    <div class="lane-floor"></div>
+    <div class="player" id="player">
+      <svg class="stick-svg" viewBox="0 0 70 120">
+        <circle cx="35" cy="18" r="12" class="stick-line"/>
+        <path d="M35 30 L35 75" class="stick-line"/>
+        <path id="p-arm-l" d="M35 42 L14 58" class="stick-line"/>
+        <path id="p-arm-r" d="M35 42 L58 34" class="stick-line"/>
+        <path d="M35 75 L18 112" class="stick-line"/>
+        <path d="M35 75 L52 112" class="stick-line"/>
+      </svg>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div>
+      <div class="buffer" id="buffer">&nbsp;</div>
+      <div class="hint">Type the glowing word to strike. One wrong letter and that word is gone.</div>
+    </div>
+    <button class="btn secondary" id="pause-btn">Pause</button>
+  </div>
+
+  <!-- Start overlay -->
+  <div class="overlay" id="start-overlay">
+    <h2>Ink Duelist</h2>
+    <p>Stickman ronin approach from the mist. Type each glowing word exactly to cut them down before they reach you. Mistype and that word escapes. Choose your duel length.</p>
+    <div class="duration-row" id="duration-row">
+      <button class="duration-btn" data-secs="60">1 minute</button>
+      <button class="duration-btn selected" data-secs="180">3 minutes</button>
+      <button class="duration-btn" data-secs="300">5 minutes</button>
+    </div>
+    <button class="btn" id="start-btn">Begin the Duel</button>
+  </div>
+
+  <!-- Upgrade overlay -->
+  <div class="overlay hidden" id="upgrade-overlay">
+    <h2>Choose a Technique</h2>
+    <p>Wave cleared. Pick one path forward.</p>
+    <div class="perks" id="perk-options"></div>
+  </div>
+
+  <!-- Game over overlay -->
+  <div class="overlay hidden" id="gameover-overlay">
+    <h2 id="gameover-title">Time's Up</h2>
+    <p id="gameover-sub">Here is how the duel unfolded.</p>
+    <div class="stats-row">
+      <div>Score<b id="final-score">0</b></div>
+      <div>Wave Reached<b id="final-wave">1</b></div>
+      <div>Best Combo<b id="final-combo">0</b></div>
+      <div>Peak WPM<b id="final-wpm">0</b></div>
+      <div>Accuracy<b id="final-acc">100%</b></div>
+      <div>Words Missed<b id="final-missed">0</b></div>
+    </div>
+    <button class="btn" id="restart-btn">Duel Again</button>
+  </div>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
