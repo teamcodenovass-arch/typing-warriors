@@ -2,11 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Ink Duelist — A Typing Battle</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Yuji+Mai&family=Shippori+Mincho:wght@500;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-  <!-- Google tag (gtag.js) -->
+<!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-7QQGP71WY0"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
@@ -15,6 +14,8 @@
 
   gtag('config', 'G-7QQGP71WY0');
 </script>
+
+<link href="https://fonts.googleapis.com/css2?family=Yuji+Mai&family=Shippori+Mincho:wght@500;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -54,10 +55,12 @@
   <div class="footer">
     <div>
       <div class="buffer" id="buffer">&nbsp;</div>
-      <div class="hint">Type the glowing word to strike. One wrong letter and that word is gone.</div>
+      <div class="hint" id="hint">Type the glowing word to strike. One wrong letter and that word is gone.</div>
     </div>
     <button class="btn secondary" id="pause-btn">Pause</button>
   </div>
+
+  <input id="mobile-input" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" inputmode="text" aria-hidden="true" tabindex="-1">
 
   <!-- Start overlay -->
   <div class="overlay" id="start-overlay">
